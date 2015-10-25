@@ -131,6 +131,13 @@ public class Flowergen {
 	/* Create flower with arbitrary number of sides
 	   I.e. internal angle = 360/sides
 	   
+	   Call to method:
+	   radius : radius of the sector
+	   sides : number of sectors in the final image
+	   ratio : the size of each pixel in the sector relative to the final image
+	   
+	   returns a (ratio*radius) square image
+	   
 	   Method created by Wes64
 	*/
 	private static boolean[][] sectorFlower(int radius, int sides, double ratio) throws RuntimeException{
