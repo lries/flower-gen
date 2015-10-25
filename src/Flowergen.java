@@ -48,7 +48,7 @@ public class Flowergen {
 	}
 	*/
 	private static Color[][] colorizeFlower(boolean[][] flower){
-		//Colorizes a flower. 
+		//Colorizes a flower. Only works on non-sector flowers 
 		Color[][] ret = new Color[flower.length][flower[0].length];
 		//find the key quarter
 		Color[][] quarter = new Color[flower.length/2][flower[0].length/2];
@@ -123,6 +123,35 @@ public class Flowergen {
 				ret[x+size][y] = quarter4[x][y];
 				ret[x+size][y+size] = quarter3[x][y];
 				ret[x][y+size] = quarter2[x][y]; 
+			}
+		}
+		return ret; 
+	}
+	
+	private static Color[][] colorizeSectorFlower(boolean[][] flower, boolean gradient, int bdeg){
+		//Colorizes a sector flower. actually I think it works for regular flowers too, but I haven't checked.
+		//programmed by lries but works on wes64's code
+		//if gradient is true, the color will be brighter/darker at the edges
+		//accent is commented out because it's NYI
+		Color[][] ret = new Color[flower.length][flower[0].length];
+		int[] center = {flower.length/2, flower[0].length/2};
+		Random r = new Random();
+		int pos = -1;
+		if (r.nextInt(2) == 0) pos = 1; 
+		int[] base = {r.nextInt(255),r.nextInt(255),r.nextInt(255)};
+		//int[] accent = {r.nextInt(255),r.nextInt(255),r.nextInt(255)};
+		while (base[0]+base[1]+base[2] < 50){
+			base[0] = r.nextInt(255); base[1] = r.nextInt(255); base[2] = r.nextInt(255);	
+		}
+		int dist; 
+		for (int x=0; x<ret.length; x++){
+			for (int y=0; y<ret.length; y++){
+				if (flower[x][y]){
+					if (gradient) dist = bdeg * pos * (int) Math.sqrt((x-center[0])*(x-center[0]) + (y-center[1])*(y-center[1]));
+					else dist = 0; 
+					ret[x][y] = new Color(adj(base[0]+dist), adj(base[1]+dist), adj(base[2]+dist));
+				}
+				else ret[x][y] = new Color(0,0,0);
 			}
 		}
 		return ret; 
@@ -277,6 +306,11 @@ public class Flowergen {
 		drawFlower(sectorFlower(8, 5, 4), "sflower2");
 		drawFlower(sectorFlower(16, 5, 2), "sflower3");
 		drawFlower(sectorFlower(32, 5, 1), "sflower4");
+		
+		drawFlower(colorizeSectorFlower(sectorFlower(4, 5, 8), true, 3), "csflower1");
+		drawFlower(colorizeSectorFlower(sectorFlower(8, 5, 4), true, 3), "csflower2");
+		drawFlower(colorizeSectorFlower(sectorFlower(16, 5, 2), true, 5), "csflower3");
+		drawFlower(colorizeSectorFlower(sectorFlower(32, 5, 1), true, 4), "csflower4");
 	}
 	
 	public static void main(String[] arg){
@@ -292,5 +326,6 @@ public class Flowergen {
 		drawFlower(generateFlower(7), "bflower4");
 		*/
 		testSectorFlower();
+		
 	}
 }
