@@ -127,6 +127,96 @@ public class Flowergen {
 		}
 		return ret; 
 	}
+	
+	/* Create flower with arbitrary number of sides
+	   I.e. internal angle = 360/sides
+	   
+	   Method created by Wes64
+	*/
+	private static boolean[][] sectorFlower(int radius, int sides, double ratio) throws RuntimeException{
+		/* Create source noise for each sector
+		   Array needs to be larger than radius, to prevent overflow.
+		*/
+		boolean[][] sector = generateQuarter(radius + 1);
+		
+		/* Define result array of booleans */
+		int diameter = (int)((double)radius * 2.0 * ratio);
+		// This diameter always gives a well-defined center point (x, y)
+		boolean[][] result = new boolean[diameter][diameter];
+		
+		/* Define internal angles */
+		if (sides < 1) {
+			throw new RuntimeException("Cannot create flower with less than 1 side");
+		}
+		
+		/* Define center - works for both x and y coordinates */
+		double center = ((double)radius) * ratio;
+		
+		/* Define sector dimensions in radians */
+		double sector_size = (2.0 * Math.PI) / ((double) sides);
+		
+		assert Math.hypot(center / ratio, center / ratio) <= radius;
+		
+		/* Mapping sectors into destination array */
+		int y = 0;
+		while (y < diameter) {
+			int x = 0;
+			while (x < diameter) {
+				/* Define centered coordinates */
+				double cx = ((double)x) - center;
+				double cy = ((double)y) - center;
+				
+				/* For each pixel x, y, get angle to center in radians */
+				double theta = Math.atan2(cx, cy);
+				
+				/* Get the modular angle within the sector */
+				double temp = (theta % sector_size);
+				/* Unfuck the modulus */
+				if (temp < 0) {
+					temp += sector_size;
+					assert temp >=0;
+				}
+				double sector_theta = (temp / sector_size);
+				
+				/* Get the distance to the point*/
+				double distance = Math.hypot(cx / ratio, cy / ratio);
+				
+				/* Add point color */
+				if ((int)distance < radius) {
+					/* Map sector_theta and distance to sector
+					   Sector is a radius*radius square array, so assuming
+					   (0, 0) is the origin, there is an angle range of
+					   [0, PI/2] degrees and a minimum distance in any direction
+					   of radius.
+					*/
+					
+					/* Get sector angle scaled from [0, sector_size] to [0, pi/2] */
+					double angle = sector_theta * (Math.PI / 2.0);
+					
+					/* Get sector coordinates - ensure rounding down */
+					int sector_x = (int)(Math.cos(angle) * distance);
+					int sector_y = (int)(Math.sin(angle) * distance);
+					
+					assert sector_x < radius;
+					assert sector_y < radius;
+					
+					/* Place sector value into array */
+					result[x][y] = sector[sector_x][sector_y];
+				} else {
+					/* Point is out of range */
+					result[x][y] = false;
+				}//End if
+				
+				x++;
+			}// End while
+			
+			y++;
+		}// End while
+		
+		/* Done with array */
+		return result;
+	}// End def
+					
 
 	private static void drawFlower(Color[][] flower, String filename){
 		//Saves a color flower with this filename. 
@@ -174,9 +264,17 @@ public class Flowergen {
 		}
 	}
 	
+	public static void testSectorFlower() {
+		/* Testing the sector flower method */
+		drawFlower(sectorFlower(4, 5, 8), "sflower1");
+		drawFlower(sectorFlower(8, 5, 4), "sflower2");
+		drawFlower(sectorFlower(16, 5, 2), "sflower3");
+		drawFlower(sectorFlower(32, 5, 1), "sflower4");
+	}
+	
 	public static void main(String[] arg){
 		//draws four color flowers
-		drawFlower(colorizeFlower(generateFlower(7)), "cflower1");
+		/*drawFlower(colorizeFlower(generateFlower(7)), "cflower1");
 		drawFlower(colorizeFlower(generateFlower(7)), "cflower2");
 		drawFlower(colorizeFlower(generateFlower(7)), "cflower3");
 		drawFlower(colorizeFlower(generateFlower(7)), "cflower4");
@@ -185,5 +283,7 @@ public class Flowergen {
 		drawFlower(generateFlower(7), "bflower2");
 		drawFlower(generateFlower(7), "bflower3");
 		drawFlower(generateFlower(7), "bflower4");
+		*/
+		testSectorFlower();
 	}
 }
