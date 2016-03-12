@@ -30,29 +30,13 @@ public class Flowergen {
 		//calls adj with most common values
 		return adj(i, 0, 255);
 	}
-	
-	/*Unused method; involved in accent colors
-	private static int ntrue(boolean[][] b, int x, int y){
-		int ret = 0;
-		int rx = adj(x-1, 0, b.length-1);
-		int tx = adj(x+1, 0, b.length-1);
-		int ry = adj(y-1, 0, b.length-1);
-		int ty = adj(y+1, 0, b.length-1);
-		for (int i = rx; i<tx+1; i++){
-			for (int j = ry; j<ty+1; j++){
-				System.out.println(i+","+j);
-				if (b[i][j]) ret++;
-			}
-		}
-		return ret; 
-	}
-	*/
+
 	private static Color[][] colorizeFlower(boolean[][] flower){
 		//Colorizes a flower. Only works on non-sector flowers 
 		Color[][] ret = new Color[flower.length][flower[0].length];
 		//find the key quarter
 		Color[][] quarter = new Color[flower.length/2][flower[0].length/2];
-		//select a base petal color - will weight this later; for now it's fully random except that it can't be too dark
+		//select a base petal color - fully random except that it can't be too dark
 		Random r = new Random();
 		int pos = r.nextInt(2);
 		int[] base = {r.nextInt(255),r.nextInt(255),r.nextInt(255)};
@@ -100,8 +84,7 @@ public class Flowergen {
 	}
 
 	private static boolean[][] rotate(boolean[][] array) {
-	//Rotates a boolean array. Could probably be worked in with the above but I'm tbh lazy as hell and this works
-		boolean[][] ret = new boolean[array[0].length][array.length];
+	      boolean[][] ret = new boolean[array[0].length][array.length];
 	      for(int i = 0; i < array[0].length;i++) {
 	         for(int j = 0; j < array.length; j++) {
 	            ret[i][j] = array[array.length - j - 1][i];
